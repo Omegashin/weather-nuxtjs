@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.1",
-    "nuxt": "^1.0.0"
+    "nuxt": "latest"
   },
   "devDependencies": {
     "cross-env": "^5.0.1",
