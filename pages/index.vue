@@ -2,21 +2,30 @@
   <section class="container">
     <div id="app">
   <h1 color="primary">Open Weather Map</h1>
-  <input v-model="cityName" type="text"/>
-  <button @click="fetch">Submit</button>
-  <section v-if="errored">Sorry, API not accessible at this moment</section>
+  <input v-model="query" type="text" @change="fetchAPI"/>
+  <button @click="fetchAPI">Submit</button>
+  <section v-if="exception">Sorry, API not accessible at this moment</section>
   <section v-else>
-    <div v-if="loading">Fetching Data... <textarea :value="this.prompt"></textarea></div>
+    <div v-if="fetching">Fetching Data...</div>
   <div v-else>
-    <b>Weather</b>:
-    <span>{{ info[0].main }}, {{ info[0].description }} 
-      <img :src="this.icon"/>
-      </span>
+    <b>Current weather</b>
+    <div v-for="weather in currentWeather" :key="weather.id">
+      <img :src="getIcon(weather.icon)" alt="weather icon">
+      <br>
+      {{ weather.main }}, {{ weather.description }}
+      </div>
+      <br>
+    <b>Next 5 day Forecast</b>
+    <div v-for="forecast in forecasts" :key="forecast.dt">
+      <hr><br>
+      <b>As of: {{forecast.dt_txt}}</b>
+    <div v-for="weather in forecast.weather" :key="weather.id">
+      <img :src="getIcon(weather.icon)" alt="weather icon">
+      <br>
+      {{ weather.main }}, {{ weather.description }}
+      </div><br>
+      </div>
   </div>
-</section>
-      <button @click="increment">{{ counter }}</button><br>
-<section>
-  {{currentWeather[0].main}}
 </section>
 </div>
   </section>
@@ -24,63 +33,38 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from "vuex";
 
 export default {
-  fetch ({ store }) {
-    store.commit('increment')
-  },
-  computed: mapState([
-    'counter',
-    'currentWeather'
-  ]),
+  //TODO fetch apis with store???
   data() {
     return {
-      cityName: "London",
-      prompt: "",
-      icon: "https://openweathermap.org/img/w/10d.png",
-      info: null,
-      loading: true,
-      errored: false
+      query: ""
     };
   },
-
-  filters: {
-    currencydecimal(value) {
-      return value.toFixed(2);
-    }
-  },
-  components: {
-    Logo
+  computed: {
+    ...mapState(["current", "forecasts", "fetching", "exception"]),
+    currentWeather() {
+      if (this.current === undefined) return;
+      return this.current.weather;
+    },
   },
   methods: {
-    
-    increment () { this.$store.commit('increment') },
-    fetch() {
-      if (this.cityName) {
-        this.prompt = "";
-        this.errored = false;
-        this.loading = true;
-        this.$axios
-          .get(
-            "https://api.openweathermap.org/data/2.5/weather?q=" +
-              this.cityName +
-              "&units=metric&APPID=91aefe6fafd6a1fc3321d3af931272bc"
-          )
-          .then(response => (this.info = response.data.weather))
-          .catch(error => {
-            console.log(error);
-            this.errored = true;
-          })
-          .finally(() => {
-            this.loading = false;
-            this.icon =
-              "https://openweathermap.org/img/w/" + this.info[0].icon + ".png";
-          });
-      } else {
-        this.prompt = "Please enter a city";
-      }
+    getIcon(icon) {
+      return "https://openweathermap.org/img/w/" + icon + ".png";
+    },
+    fetchAPI() {
+      if (this.query === "") return;
+      this.$store.dispatch("fetchCurrent", this.query);
     }
+  },
+  //  watch: {
+  //       query: function (val) {
+  //           this.fetchAPI()
+  //       }
+  //   },
+  components: {
+    Logo
   }
 };
 </script>
