@@ -3,12 +3,16 @@ import Vuex from 'vuex'
 const store = () => {
   return new Vuex.Store({
     state: {
+      location: "London, UK",
       current: [],
       forecasts: [],
       fetching: false,
       exception: false
     },
     mutations: {
+      location(state, location) {
+        state.location = location;
+      },
       current(state, current) {
         state.current = current;
       },
@@ -29,6 +33,14 @@ const store = () => {
       }
     },
     actions: {
+      fetchLocation(context) {
+        this.$axios.get("https://ipinfo.io?token=e9f0170de3acd7")
+          .then(response => {
+            //console.log(response.data.city + ", " + response.data.country);
+            var location = response.data.city + ", " + response.data.country;
+            context.commit('location', location);
+          })
+      },
       fetchCurrent(context, query) {
         context.commit('fetching', true);
         context.commit('clearCurrent');
@@ -51,7 +63,7 @@ const store = () => {
             context.commit('exception', true);
           })
 
-          this.$axios
+        this.$axios
           .get(
             "https://api.openweathermap.org/data/2.5/forecast?q=" +
             query +

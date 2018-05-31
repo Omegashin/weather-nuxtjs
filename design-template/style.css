@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.grid-parent {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-columns: 1fr;
+  grid-template-rows: 2fr 1fr;
+  grid-template-areas: "current" "forecast";
+}
+
+.current-weather-parent {
+  grid-area: current;
+  margin: 16px 16px 8px;
+  padding: 16px;
+  color: rgb(66, 66, 66);
+  box-shadow: 0px 8px 16px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  background: linear-gradient(0.125turn, rgba(255, 207, 84, 1), rgba(255, 130, 205, 1));
+}
+
+.forecast-parent {
+  grid-area: forecast;
+  margin: 8px 16px 16px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0px 8px 16px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  background: linear-gradient(to right, rgb(196, 94, 255), rgb(148, 34, 255));
+}
